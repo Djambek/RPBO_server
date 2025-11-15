@@ -13,15 +13,15 @@ import java.util.concurrent.atomic.AtomicLong;
 @Tag(name = "Самолеты")
 @RequestMapping("/aircrafts")
 public class AircraftController {
-    private final Map<Long, Aircraft> aircrafts = new HashMap<>();
+    private final Map<UUID, Aircraft> aircrafts = new HashMap<>();
     private final AtomicLong idCounter = new AtomicLong(1);
 
     public AircraftController() {
-        Long id1 = idCounter.getAndIncrement();
-        aircrafts.put(id1, new Aircraft(id1, "Boeing 737", 180));
+        UUID uuid1 = UUID.randomUUID();
+        aircrafts.put(uuid1, new Aircraft(uuid1, "Boeing 737", 180));
 
-        Long id2 = idCounter.getAndIncrement();
-        aircrafts.put(id2, new Aircraft(id2, "Airbus A320", 150));
+        UUID uuid2 = UUID.randomUUID();
+        aircrafts.put(uuid2, new Aircraft(uuid2, "Airbus A320", 150));
     }
 
     @GetMapping
@@ -32,7 +32,7 @@ public class AircraftController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение самолета по ид")
-    public Aircraft getById(@PathVariable("id") Long id) {
+    public Aircraft getById(@PathVariable("id") UUID id) {
         Aircraft aircraft = aircrafts.get(id);
         if (aircraft == null) {
             throw new RuntimeException("Aircraft not found with id: " + id);
@@ -43,26 +43,25 @@ public class AircraftController {
     @PostMapping
     @Operation(summary = "Создание самолета")
     public Aircraft create(@RequestBody Aircraft aircraft) {
-        Long newId = idCounter.getAndIncrement();
-        aircraft.setId(newId);
-        aircrafts.put(newId, aircraft);
+        UUID uuid = UUID.randomUUID();
+        aircrafts.put(uuid, aircraft);
         return aircraft;
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменение самолета")
-    public Aircraft update(@PathVariable("id") Long id, @RequestBody Aircraft aircraft) {
+    public Aircraft update(@PathVariable("id") UUID id, @RequestBody Aircraft aircraft) {
         if (!aircrafts.containsKey(id)) {
             throw new RuntimeException("Aircraft not found with id: " + id);
         }
-        aircraft.setId(id);
-        aircrafts.put(id, aircraft);
+        UUID uuid = UUID.randomUUID();
+        aircrafts.put(uuid, aircraft);
         return aircraft;
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление самолета по идшнику")
-    public void delete(@PathVariable("id") Long id) {
+    public void delete(@PathVariable("id") UUID id) {
         if (!aircrafts.containsKey(id)) {
             throw new RuntimeException("Aircraft not found with id: " + id);
         }
