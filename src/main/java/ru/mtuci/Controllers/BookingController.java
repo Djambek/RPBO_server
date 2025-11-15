@@ -32,13 +32,13 @@ public class BookingController {
 
     @PostMapping
     @Operation(summary = "Создание новой брони")
-    public ResponseEntity<Booking> create(@RequestBody BookingRequest request) {
+    public ResponseEntity<?> create(@RequestBody BookingRequest request) {
         return bookingService.create(request);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Обновление бронирования пассажира по ид")
-    public ResponseEntity<Booking> update(@PathVariable("id") UUID id, @RequestBody BookingRequest request) {
+    public ResponseEntity<?> update(@PathVariable("id") UUID id, @RequestBody BookingRequest request) {
         return bookingService.update(id, request);
     }
 

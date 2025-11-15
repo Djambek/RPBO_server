@@ -33,13 +33,13 @@ public class FlightController {
 
     @PostMapping
     @Operation(summary = "Создание полета")
-    public ResponseEntity<Flight> create(@RequestBody FlightRequest request) {
+    public ResponseEntity<?> create(@RequestBody FlightRequest request) {
         return flightService.create(request);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменение полета по ид")
-    public ResponseEntity<Flight> update(@PathVariable("id") UUID id, @RequestBody FlightRequest request) {
+    public ResponseEntity<?> update(@PathVariable("id") UUID id, @RequestBody FlightRequest request) {
         return flightService.update(id, request);
     }
 
