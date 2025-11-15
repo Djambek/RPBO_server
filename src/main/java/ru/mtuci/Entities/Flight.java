@@ -1,22 +1,37 @@
 package ru.mtuci.Entities;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+
+@Entity
+@Table(name = "flights")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Flight {
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
     private String flightNumber;
-    private Long departureAirportId;
-    private Long arrivalAirportId;
+    private UUID departureAirportId;
+    private UUID arrivalAirportId;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    private Long aircraftId;
+    private UUID aircraftId;
 
-    public Flight() {}
 
-    public Flight(Long id, String flightNumber, Long departureAirportId,
-                  Long arrivalAirportId, LocalDateTime departureTime,
-                  LocalDateTime arrivalTime, Long aircraftId) {
-        this.id = id;
+    public Flight(String flightNumber, UUID departureAirportId,
+                  UUID arrivalAirportId, LocalDateTime departureTime,
+                  LocalDateTime arrivalTime, UUID aircraftId) {
         this.flightNumber = flightNumber;
         this.departureAirportId = departureAirportId;
         this.arrivalAirportId = arrivalAirportId;
@@ -24,20 +39,4 @@ public class Flight {
         this.arrivalTime = arrivalTime;
         this.aircraftId = aircraftId;
     }
-
-    // Геттеры и сеттеры
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getFlightNumber() { return flightNumber; }
-    public void setFlightNumber(String flightNumber) { this.flightNumber = flightNumber; }
-    public Long getDepartureAirportId() { return departureAirportId; }
-    public void setDepartureAirportId(Long departureAirportId) { this.departureAirportId = departureAirportId; }
-    public Long getArrivalAirportId() { return arrivalAirportId; }
-    public void setArrivalAirportId(Long arrivalAirportId) { this.arrivalAirportId = arrivalAirportId; }
-    public LocalDateTime getDepartureTime() { return departureTime; }
-    public void setDepartureTime(LocalDateTime departureTime) { this.departureTime = departureTime; }
-    public LocalDateTime getArrivalTime() { return arrivalTime; }
-    public void setArrivalTime(LocalDateTime arrivalTime) { this.arrivalTime = arrivalTime; }
-    public Long getAircraftId() { return aircraftId; }
-    public void setAircraftId(Long aircraftId) { this.aircraftId = aircraftId; }
 }

@@ -7,9 +7,12 @@ services:
       dockerfile: Dockerfile
     container_name: flight-booking-app
     ports:
-      - "8080:8080"
+      - "8085:8080"
     environment:
       - SPRING_APPLICATION_NAME=flight-booking-app
+      - DB_URL=jdbc:postgresql://postgres-db:5432/flightdb
+      - DB_USER=postgres
+      - DB_PASS=postgres
     networks:
       - monitoring-network
     healthcheck:
@@ -18,6 +21,19 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  postgres-db:
+    image: postgres:14-alpine
+    container_name: postgres-db
+    environment:
+      - POSTGRES_DB=flightdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - monitoring-network
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:v2.35.0
@@ -37,7 +53,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:9.5.2  # Фиксируем версию вместо latest
+    image: grafana/grafana:9.5.2
     container_name: grafana
     ports:
       - "9000:3000"
@@ -46,7 +62,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning  # Раскомментировал для автоматической настройки
+      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - monitoring-network
     restart: unless-stopped
@@ -56,6 +72,7 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  postgres_data:
 
 networks:
   monitoring-network:

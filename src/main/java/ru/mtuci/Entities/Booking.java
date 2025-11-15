@@ -1,27 +1,34 @@
 package ru.mtuci.Entities;
 
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Entity
+@Table(name = "bookings")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Booking {
-    private Long id;
-    private Long flightId;
-    private Long passengerId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    private UUID flightId;
+    private UUID passengerId;
     private String seatNumber;
 
-    public Booking() {}
 
-    public Booking(Long id, Long flightId, Long passengerId, String seatNumber) {
-        this.id = id;
+    public Booking(UUID flightId, UUID passengerId, String seatNumber) {
         this.flightId = flightId;
         this.passengerId = passengerId;
         this.seatNumber = seatNumber;
     }
 
-    // Геттеры и сеттеры
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Long getFlightId() { return flightId; }
-    public void setFlightId(Long flightId) { this.flightId = flightId; }
-    public Long getPassengerId() { return passengerId; }
-    public void setPassengerId(Long passengerId) { this.passengerId = passengerId; }
-    public String getSeatNumber() { return seatNumber; }
-    public void setSeatNumber(String seatNumber) { this.seatNumber = seatNumber; }
 }

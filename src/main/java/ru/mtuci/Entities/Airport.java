@@ -1,27 +1,32 @@
 package ru.mtuci.Entities;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Entity
+@Table(name = "airports")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Airport {
-    private Long id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
     private String code;
     private String name;
     private String city;
 
-    public Airport() {}
-
-    public Airport(Long id, String code, String name, String city) {
-        this.id = id;
+    public Airport(String code, String name, String city) {
         this.code = code;
         this.name = name;
         this.city = city;
     }
-
-    // Геттеры и сеттеры
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
 }

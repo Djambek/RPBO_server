@@ -2,8 +2,13 @@ package ru.mtuci.Controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mtuci.Entities.Passenger;
+import ru.mtuci.Repositories.PassangerRepository;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -11,61 +16,48 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 @Tag(name="Пассажиры")
 @RequestMapping("/passengers")
+@RequiredArgsConstructor
 public class PassengerController {
-    private final Map<Long, Passenger> passengers = new HashMap<>();
-    private final AtomicLong idCounter = new AtomicLong(1);
+    private final PassangerRepository passangerRepository;
 
-    public PassengerController() {
-        // Тестовые данные
-        Long id1 = idCounter.getAndIncrement();
-        passengers.put(id1, new Passenger(id1, "John", "Doe", "john.doe@email.com", "+1234567890"));
 
-        Long id2 = idCounter.getAndIncrement();
-        passengers.put(id2, new Passenger(id2, "Jane", "Smith", "jane.smith@email.com", "+0987654321"));
-    }
 
     @GetMapping
     @Operation(summary = "Получение всех пассажиров")
     public List<Passenger> getAll() {
-        return new ArrayList<>(passengers.values());
+        return passangerRepository.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение пассажира по ид")
-    public Passenger getById(@PathVariable("id") Long id) {
-        Passenger passenger = passengers.get(id);
-        if (passenger == null) {
-            throw new RuntimeException("Passenger not found with id: " + id);
-        }
-        return passenger;
+    public Passenger getById(@PathVariable("id") UUID id) {
+        return passangerRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Not found passenger with id: " + id)
+        );
     }
 
     @PostMapping
     @Operation(summary = "Создание пассажира")
     public Passenger create(@RequestBody Passenger passenger) {
-        Long newId = idCounter.getAndIncrement();
-        passenger.setId(newId);
-        passengers.put(newId, passenger);
-        return passenger;
+        return ResponseEntity.status(HttpStatus.CREATED).body(passangerRepository.save(passenger)).getBody();
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменение пассажира по ид")
-    public Passenger update(@PathVariable("id") Long id, @RequestBody Passenger passenger) {
-        if (!passengers.containsKey(id)) {
+    public Passenger update(@PathVariable("id") UUID id, @RequestBody Passenger passenger) {
+        if (!passangerRepository.existsById(id)) {
             throw new RuntimeException("Passenger not found with id: " + id);
         }
         passenger.setId(id);
-        passengers.put(id, passenger);
-        return passenger;
+        return passangerRepository.save(passenger);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление пассажира по ид")
-    public void delete(@PathVariable("id") Long id) {
-        if (!passengers.containsKey(id)) {
+    public void delete(@PathVariable("id") UUID id) {
+        if (!passangerRepository.existsById(id)) {
             throw new RuntimeException("Passenger not found with id: " + id);
         }
-        passengers.remove(id);
+        passangerRepository.deleteById(id);
     }
 }

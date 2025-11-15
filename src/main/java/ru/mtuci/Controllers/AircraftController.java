@@ -1,70 +1,65 @@
 package ru.mtuci.Controllers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 
 import ru.mtuci.Entities.Aircraft;
+import ru.mtuci.Entities.Airport;
+import ru.mtuci.Repositories.AircraftRepository;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @Tag(name = "Самолеты")
+@RequiredArgsConstructor
 @RequestMapping("/aircrafts")
 public class AircraftController {
-    private final Map<UUID, Aircraft> aircrafts = new HashMap<>();
-    private final AtomicLong idCounter = new AtomicLong(1);
 
-    public AircraftController() {
-        UUID uuid1 = UUID.randomUUID();
-        aircrafts.put(uuid1, new Aircraft(uuid1, "Boeing 737", 180));
 
-        UUID uuid2 = UUID.randomUUID();
-        aircrafts.put(uuid2, new Aircraft(uuid2, "Airbus A320", 150));
-    }
+    private final AircraftRepository aircraftRepository;
+
 
     @GetMapping
     @Operation(summary = "Получение всех самолетов")
     public List<Aircraft> getAll() {
-        return new ArrayList<>(aircrafts.values());
+        return aircraftRepository.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение самолета по ид")
     public Aircraft getById(@PathVariable("id") UUID id) {
-        Aircraft aircraft = aircrafts.get(id);
-        if (aircraft == null) {
-            throw new RuntimeException("Aircraft not found with id: " + id);
-        }
-        return aircraft;
+        return aircraftRepository.findById(id).orElseThrow(() -> new RuntimeException("Aircraft not found with id: " + id));
     }
 
     @PostMapping
     @Operation(summary = "Создание самолета")
     public Aircraft create(@RequestBody Aircraft aircraft) {
-        UUID uuid = UUID.randomUUID();
-        aircrafts.put(uuid, aircraft);
-        return aircraft;
+        Aircraft savedAircraft = aircraftRepository.save(aircraft);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAircraft).getBody();
+
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменение самолета")
     public Aircraft update(@PathVariable("id") UUID id, @RequestBody Aircraft aircraft) {
-        if (!aircrafts.containsKey(id)) {
+        if (!aircraftRepository.existsById(id)) {
             throw new RuntimeException("Aircraft not found with id: " + id);
         }
-        UUID uuid = UUID.randomUUID();
-        aircrafts.put(uuid, aircraft);
-        return aircraft;
+        aircraft.setId(id);
+       return aircraftRepository.save(aircraft);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление самолета по идшнику")
     public void delete(@PathVariable("id") UUID id) {
-        if (!aircrafts.containsKey(id)) {
+        if (!aircraftRepository.existsById(id)) {
             throw new RuntimeException("Aircraft not found with id: " + id);
         }
-        aircrafts.remove(id);
+        aircraftRepository.deleteById(id);
     }
 }
