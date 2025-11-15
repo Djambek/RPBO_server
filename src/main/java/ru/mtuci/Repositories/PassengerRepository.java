@@ -5,5 +5,5 @@ import ru.mtuci.Entities.Passenger;
 
 import java.util.UUID;
 
-public interface PassangerRepository extends JpaRepository<Passenger, UUID> {
+public interface PassengerRepository extends JpaRepository<Passenger, UUID> {
 }

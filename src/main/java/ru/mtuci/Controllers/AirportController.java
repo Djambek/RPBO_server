@@ -3,60 +3,49 @@ package ru.mtuci.Controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mtuci.Entities.Airport;
-import ru.mtuci.Repositories.AirportRepository;
+import ru.mtuci.Models.AirportRequest;
+import ru.mtuci.Services.AirportService;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @Tag(name="Аэропорты")
 @RequestMapping("/airports")
 @RequiredArgsConstructor
 public class AirportController {
-    private final AirportRepository airportRepository;
+    private final AirportService airportService;
 
 
     @GetMapping
     @Operation(summary = "Получение всех аэропортов")
-    public List<Airport> getAll() {
-        return airportRepository.findAll();
+    public ResponseEntity<List<Airport>> getAll() {
+        return airportService.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Получение аэропорта по ид")
-    public Airport getById(@PathVariable("id") UUID id) {
-        return airportRepository.findById(id).orElseThrow(() ->
-                new RuntimeException("Not found airport with id: " + id));
+    public ResponseEntity<Airport> getById(@PathVariable("id") UUID id) {
+        return airportService.findById(id);
     }
 
     @PostMapping
     @Operation(summary = "Создание аэропорта")
-    public Airport create(@RequestBody Airport airport) {
-      return ResponseEntity.status(HttpStatus.CREATED).body(airportRepository.save(airport)).getBody();
+    public ResponseEntity<Airport> create(@RequestBody AirportRequest request) {
+        return airportService.create(request);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Изменение аэропорта по ид")
-    public Airport update(@PathVariable("id") UUID id, @RequestBody Airport airport) {
-        if (!airportRepository.existsById(id)) {
-            throw new RuntimeException("Airport not found with id: " + id);
-        }
-        airport.setId(id);
-        return airportRepository.save(airport);
+    public ResponseEntity<Airport> update(@PathVariable("id") UUID id, @RequestBody AirportRequest request) {
+        return airportService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление аэропорта по ид")
-    public void delete(@PathVariable("id") UUID id) {
-        if (!airportRepository.existsById(id)) {
-            throw new RuntimeException("Airport not found with id: " + id);
-        }
-        airportRepository.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
+        return airportService.delete(id);
     }
 }
