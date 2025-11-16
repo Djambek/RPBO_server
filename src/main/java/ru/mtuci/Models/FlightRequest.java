@@ -1,11 +1,14 @@
 package ru.mtuci.Models;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@AllArgsConstructor
 @Getter
 public class FlightRequest {
     private String flightNumber;
