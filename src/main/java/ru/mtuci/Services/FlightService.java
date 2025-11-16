@@ -6,10 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.mtuci.Entities.Flight;
 import ru.mtuci.Models.FlightRequest;
-import ru.mtuci.Repositories.AircraftRepository;
-import ru.mtuci.Repositories.AirportRepository;
 import ru.mtuci.Repositories.FlightRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,8 +17,9 @@ import java.util.UUID;
 @Service
 public class FlightService {
     public final FlightRepository flightRepository;
-    public final AirportRepository airportRepository;
-    public final AircraftRepository aircraftRepository;
+
+    public final AirportService airportService;
+    public final AircraftService aircraftService;
 
     public ResponseEntity<Flight> findById(UUID id){
         if (!flightRepository.existsById(id)){
@@ -33,15 +33,15 @@ public class FlightService {
     }
 
     public ResponseEntity<?> create(FlightRequest flightRequest) {
-        if (!aircraftRepository.existsById(flightRequest.getAircraftId())){
+        if (!aircraftService.existsById(flightRequest.getAircraftId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found aircraft with id: " + flightRequest.getAircraftId()));
         }
-        if (!airportRepository.existsById(flightRequest.getArrivalAirportId())){
+        if (!airportService.existsById(flightRequest.getArrivalAirportId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found airport with id: " + flightRequest.getArrivalAirportId()));
         }
-        if (!airportRepository.existsById(flightRequest.getDepartureAirportId())){
+        if (!airportService.existsById(flightRequest.getDepartureAirportId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found airport with id: " + flightRequest.getDepartureAirportId()));
         }
@@ -61,15 +61,15 @@ public class FlightService {
         if (!flightRepository.existsById(id)){
             return ResponseEntity.notFound().build();
         }
-        if (!aircraftRepository.existsById(flightRequest.getAircraftId())){
+        if (!aircraftService.existsById(flightRequest.getAircraftId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found aircraft with id: " + flightRequest.getAircraftId()));
         }
-        if (!airportRepository.existsById(flightRequest.getArrivalAirportId())){
+        if (!airportService.existsById(flightRequest.getArrivalAirportId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found airport with id: " + flightRequest.getArrivalAirportId()));
         }
-        if (!airportRepository.existsById(flightRequest.getDepartureAirportId())){
+        if (!airportService.existsById(flightRequest.getDepartureAirportId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found airport with id: " + flightRequest.getDepartureAirportId()));
         }
@@ -92,5 +92,21 @@ public class FlightService {
 
         flightRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    public Flight findByNumber(String number){
+        return flightRepository.findByFlightNumber(number);
+    }
+
+    public List<Flight> findUncompletedFlight(LocalDateTime time){
+        return flightRepository.findUncompletedFlight(time);
+    }
+
+    public boolean existsById(UUID flightId) {
+        return flightRepository.existsById(flightId);
+    }
+
+    public void clean() {
+        flightRepository.deleteAll();
     }
 }

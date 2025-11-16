@@ -57,5 +57,12 @@ public class AircraftService{
         return ResponseEntity.noContent().build();
     }
 
+    public boolean existsById(UUID aircraftId) {
+        return aircraftRepository.existsById(aircraftId);
+    }
+
+    public void clean() {
+        aircraftRepository.deleteAll();
+    }
 }
 

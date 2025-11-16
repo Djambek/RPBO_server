@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.mtuci.Entities.Booking;
 import ru.mtuci.Models.BookingRequest;
 import ru.mtuci.Repositories.BookingRepository;
-import ru.mtuci.Repositories.FlightRepository;
-import ru.mtuci.Repositories.PassengerRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -18,8 +16,9 @@ import java.util.UUID;
 @Service
 public class BookingService {
     private final BookingRepository bookingRepository;
-    private final FlightRepository flightRepository;
-    private final PassengerRepository passengerRepository;
+
+    private final FlightService flightService;
+    private final PassengerService passengerService;
 
     public ResponseEntity<Booking> findById(UUID id){
         if (!bookingRepository.existsById(id)){
@@ -33,11 +32,11 @@ public class BookingService {
     }
 
     public ResponseEntity<?> create(BookingRequest bookingRequest){
-        if (!flightRepository.existsById(bookingRequest.getFlightId())) {
+        if (!flightService.existsById(bookingRequest.getFlightId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found flight with id: " + bookingRequest.getFlightId()));
         }
-        if (!passengerRepository.existsById(bookingRequest.getPassengerId())){
+        if (!passengerService.existsById(bookingRequest.getPassengerId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found passenger with id: " + bookingRequest.getPassengerId()));
         }
@@ -53,11 +52,11 @@ public class BookingService {
         if (!bookingRepository.existsById(id)){
             return ResponseEntity.notFound().build();
         }
-        if (!flightRepository.existsById(bookingRequest.getFlightId())) {
+        if (!flightService.existsById(bookingRequest.getFlightId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found flight with id: " + bookingRequest.getFlightId()));
         }
-        if (!passengerRepository.existsById(bookingRequest.getPassengerId())){
+        if (!passengerService.existsById(bookingRequest.getPassengerId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
                     "Not found passenger with id: " + bookingRequest.getPassengerId()));
         }
@@ -75,5 +74,33 @@ public class BookingService {
         }
         bookingRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    public void deleteAllBookingByPassengerId(UUID id) {
+        bookingRepository.deleteAllByPassengerId(id);
+    }
+
+    public void deleteAllByFlightId(UUID id){
+        bookingRepository.deleteAllByFlightId(id);
+    }
+
+    public Integer countByFlightId(UUID id) {
+        return bookingRepository.countByFlightId(id);
+    }
+
+    public boolean alreadyRegistered(UUID flightId, UUID passengerId) {
+        return bookingRepository.existsByFlightIdAndPassengerId(flightId, passengerId);
+    }
+
+    public boolean seatNumberAlreadyBooked(UUID flightId, String seatNumber) {
+        return bookingRepository.existsByFlightIdAndSeatNumber(flightId, seatNumber);
+    }
+
+    public List<Booking> getBookingsByFlightId(UUID id) {
+        return bookingRepository.findByFlightId(id);
+    }
+
+    public void clean() {
+        bookingRepository.deleteAll();
     }
 }

@@ -54,6 +54,14 @@ public class AirportService {
             return ResponseEntity.notFound().build();
         }
         airportRepository.deleteById(id);
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
+    }
+
+    public boolean existsById(UUID airportId) {
+        return airportRepository.existsById(airportId);
+    }
+
+    public void clean() {
+        airportRepository.deleteAll();
     }
 }

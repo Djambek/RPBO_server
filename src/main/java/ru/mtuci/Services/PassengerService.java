@@ -57,4 +57,12 @@ public class PassengerService {
         passengerRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    public boolean existsById(UUID passengerId) {
+        return passengerRepository.existsById(passengerId);
+    }
+
+    public void clean() {
+        passengerRepository.deleteAll();
+    }
 }
